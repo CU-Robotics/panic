@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 #include "WiFi.h"
-#include "ESPAsyncWebServer.h"
 
 /* rotary encoder to seven segment */
 //D15 -> SW on encoder
@@ -53,18 +52,6 @@ const uint8_t nine[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_F | SEG_G}
 const char* ssid = "ESP32-Access-Point";
 const char* password = "123456789";
 
-//create AsyncWebServer object on port 80
-AsyncWebServer server(80);
-
-//function to get connected robot number
-String counterStr = "";
-String oneStr = "1";
-String twoStr = "2";
-String threeStr = "3";
-String fourStr = "4";
-String readRobotConnected() {
-  return counterStr;
-}
 
 void setup(){
   /* rotary encoder to seven segment */
@@ -78,40 +65,18 @@ void setup(){
 
   //Serial.begin(115200);
   Serial.println();
-
-  /* ESP32 client-server wifi communication between two boards */
-  // Serial port for debugging purposes
-  //Serial.begin(115200);
-  //Serial.println();
   
   //Setting the ESP as an access point
   Serial.print("Setting AP (Access Point)…");
   // Remove the password parameter, if you want the AP (Access Point) to be open
-  WiFi.softAP(ssid, password);
 
-  IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
-  Serial.println(IP);
 
-  server.on("/connectedRobot", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", readRobotConnected().c_str());
-  });
-
-  server.begin();
 }
 
 void loop(){
   //set brightness
   display.setBrightness(7);
-
-  // //all segments on
-  // display.setSegments(data);
-  
-
-  // display.setSegments(dead);
-  // delay(1000);
-  // display.setSegments(beef);
-  // delay(1000);
 
   //https://www.best-microcontroller-projects.com/rotary-encoder.html
 
@@ -129,19 +94,5 @@ void loop(){
     counter = counter % 4;
     //counter = counter + 1;
     Serial.println(counter);
-
-    if(counter == 0){
-      display.setSegments(one);
-      counterStr = oneStr;
-    } else if (counter == 1){
-      display.setSegments(two);
-      counterStr = twoStr;
-    } else if (counter == 2){
-      display.setSegments(three);
-      counterStr = threeStr;
-    } else if (counter == 3){
-      display.setSegments(four);
-      counterStr = fourStr;
-    }
   }
 }
