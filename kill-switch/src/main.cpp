@@ -16,11 +16,19 @@ AsyncWebServer server(80);
 unsigned long lastReceived;
 bool inDistress = false;
 
+void IRAM_ATTR Ext_INT1_ISR()
+{
+  
+}
+
 void setup(){
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, HIGH);
+  pinMode(2, INPUT);
+  pinMode(4, INPUT);
+  attachInterrupt(2, Ext_INT1_ISR, RISING);
 
   /* ESP32 client-server wifi communication between two boards */
   // Serial port for debugging purposes
