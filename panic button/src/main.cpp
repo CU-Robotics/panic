@@ -65,15 +65,6 @@ void loop(){
   //set brightness
   display.setBrightness(7);
 
-  // //all segments on
-  // display.setSegments(data);
-  
-
-  // display.setSegments(dead);
-  // delay(1000);
-  // display.setSegments(beef);
-  // delay(1000);
-
   //https://www.best-microcontroller-projects.com/rotary-encoder.html
 
   static uint16_t state = 0, counter = 0;
@@ -90,19 +81,5 @@ void loop(){
     counter = counter % 4;
     //counter = counter + 1;
     Serial.println(counter);
-
-    if(counter == 0){
-      display.setSegments(one);
-      counterStr = oneStr;
-    } else if (counter == 1){
-      display.setSegments(two);
-      counterStr = twoStr;
-    } else if (counter == 2){
-      display.setSegments(three);
-      counterStr = threeStr;
-    } else if (counter == 3){
-      display.setSegments(four);
-      counterStr = fourStr;
-    }
   }
 }
