@@ -47,25 +47,6 @@ const uint8_t seven[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C}; //7
 const uint8_t eight[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G}; //8
 const uint8_t nine[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_F | SEG_G}; //9
 
-
-/* ESP32 client-server wifi communication between two boards */
-//set access point network credentials
-const char* ssid = "ESP32-Access-Point";
-const char* password = "123456789";
-
-//create AsyncWebServer object on port 80
-AsyncWebServer server(80);
-
-//function to get connected robot number
-String counterStr = "";
-String oneStr = "1";
-String twoStr = "2";
-String threeStr = "3";
-String fourStr = "4";
-String readRobotConnected() {
-  return counterStr;
-}
-
 void setup(){
   /* rotary encoder to seven segment */
   //clear display
@@ -78,26 +59,6 @@ void setup(){
 
   //Serial.begin(115200);
   Serial.println();
-
-  /* ESP32 client-server wifi communication between two boards */
-  // Serial port for debugging purposes
-  //Serial.begin(115200);
-  //Serial.println();
-  
-  //Setting the ESP as an access point
-  Serial.print("Setting AP (Access Point)…");
-  // Remove the password parameter, if you want the AP (Access Point) to be open
-  WiFi.softAP(ssid, password);
-
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
-
-  server.on("/connectedRobot", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", readRobotConnected().c_str());
-  });
-
-  server.begin();
 }
 
 void loop(){
