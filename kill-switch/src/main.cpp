@@ -13,8 +13,8 @@ const char* password = "123456789";
 //create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
-unsigned long lastReceived;
-bool inDistress = false;
+unsigned long lastReceived = INT_MAX;
+unsigned long inDistress = 0;
 
 void IRAM_ATTR Ext_INT1_ISR()
 {
@@ -51,7 +51,7 @@ void setup(){
 
   server.on("/distress", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", "panic");
-    inDistress = true;
+    inDistress = millis();
   });
 
   server.begin();
@@ -63,8 +63,13 @@ void loop(){
   // digitalWrite(IN2, LOW);
   // }
 
-  if(lastReceived > 500 || inDistress == true){
+  if((millis() - lastReceived > 500) || (millis() - inDistress < 500)){
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
+  }
+
+  if((millis() - lastReceived < 500) && (millis() - inDistress > 500)){
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, HIGH);
   }
 }
