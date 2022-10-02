@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <TM1637Display.h>
 #include "WiFi.h"
-#include "ESPAsyncWebServer.h"
+// #include "ESPAsyncWebServer.h"
 
 /* rotary encoder to seven segment */
 //D15 -> SW on encoder
@@ -11,8 +11,12 @@
 //define connections pins
 #define CLK 27
 #define DIO 14
-#define outputA 4 //CLK
-#define outputB 2 //D
+#define OUTPUT_A 4 //CLK
+#define OUTPUT_B 2 //D
+
+#define BIG_BUTTON 5
+
+int counter = 0;
 
 //create display object of type TM1637
 TM1637Display display = TM1637Display(CLK, DIO); //not quite sure about this line
@@ -47,13 +51,32 @@ const uint8_t seven[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C}; //7
 const uint8_t eight[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G}; //8
 const uint8_t nine[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_F | SEG_G}; //9
 
+void IRAM_ATTR encoder_ISR()
+{
+  if (digitalRead(OUTPUT_B))
+  {
+    counter++;
+  } else {
+    if (counter > 0)
+    {
+      counter--;
+    }
+    
+  }
+  
+}
+
 void setup(){
   /* rotary encoder to seven segment */
   //clear display
   display.clear();
 
-  pinMode(outputA, INPUT);
-  pinMode(outputB, INPUT);
+  pinMode(OUTPUT_A, INPUT);
+  pinMode(OUTPUT_B, INPUT);
+
+  pinMode(BIG_BUTTON, INPUT_PULLDOWN);
+
+  attachInterrupt(OUTPUT_A, encoder_ISR, RISING);
 
   Serial.begin(9600);
 
@@ -69,17 +92,4 @@ void loop(){
 
   static uint16_t state = 0, counter = 0;
 
-  state = (state << 1) | digitalRead(outputA) | 0xe000; //digital filter is made up of a single 16 bit integer variable into which you shift the current state of the input pin
-
-  if(state == 0xf000){
-      state = 0x0000;
-    if(digitalRead(outputB)){
-      counter--;
-    } else {
-      counter++;
-    }
-    counter = counter % 4;
-    //counter = counter + 1;
-    Serial.println(counter);
-  }
 }
