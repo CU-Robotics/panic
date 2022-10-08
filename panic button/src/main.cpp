@@ -16,7 +16,17 @@
 
 #define BIG_BUTTON 5
 
+#define SELECT_PIN 15 //button on encoder
+
+int oldCount = 0;
 int counter = 0;
+
+unsigned long lastEnc = 0;
+
+bool bState = false;
+
+String SSID = "";
+// bool connected
 
 //create display object of type TM1637
 TM1637Display display = TM1637Display(CLK, DIO); //not quite sure about this line
@@ -27,59 +37,26 @@ const uint8_t data[] = {0xff, 0xff, 0xff, 0xff};
 //array that turns all segments off
 const uint8_t blank[] = {0x00, 0x00, 0x00, 0x00};
 
-const uint8_t dead[] = {
-  SEG_B | SEG_C | SEG_D | SEG_E | SEG_G,           // d
-  SEG_A | SEG_D | SEG_E | SEG_F | SEG_G,           // E
-  SEG_A | SEG_B | SEG_C | SEG_E | SEG_F | SEG_G,   // A
-  SEG_B | SEG_C | SEG_D | SEG_E | SEG_G            // d
-};
-
-const uint8_t beef[] = {
-  SEG_C | SEG_D | SEG_E | SEG_F | SEG_G,           // b
-  SEG_A | SEG_D | SEG_E | SEG_F | SEG_G,           // E
-  SEG_A | SEG_D | SEG_E | SEG_F | SEG_G,           // E
-  SEG_A | SEG_E | SEG_F | SEG_G                    // f
-};
-
-// const uint8_t one[] = {0x00, 0x00, 0x00, SEG_B | SEG_C}; //1
-// const uint8_t two[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_D | SEG_E | SEG_G}; //2
-// const uint8_t three[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_D | SEG_G}; //3
-// const uint8_t four[] = {0x00, 0x00, 0x00, SEG_B | SEG_C | SEG_F | SEG_G}; //4
-// const uint8_t five[] = {0x00, 0x00, 0x00, SEG_A | SEG_C | SEG_D | SEG_F | SEG_G}; //5
-// const uint8_t six[] = {0x00, 0x00, 0x00, SEG_A | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G}; //6
-// const uint8_t seven[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C}; //7
-// const uint8_t eight[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G}; //8
-// const uint8_t nine[] = {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_F | SEG_G}; //9
-
-// const uint8_t numbers[9][4] = {
-//   {0x00, 0x00, 0x00, SEG_B | SEG_C},  //1
-//   {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_D | SEG_E | SEG_G}, //2
-//   {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_D | SEG_G}, //3
-//   {0x00, 0x00, 0x00, SEG_B | SEG_C | SEG_F | SEG_G}, //4
-//   {0x00, 0x00, 0x00, SEG_A | SEG_C | SEG_D | SEG_F | SEG_G}, //5
-//   {0x00, 0x00, 0x00, SEG_A | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G}, //6
-//   {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C}, //7
-//   {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G}, //8
-//   {0x00, 0x00, 0x00, SEG_A | SEG_B | SEG_C | SEG_F | SEG_G}  //9
-//  };
-
-void IRAM_ATTR encoder_ISR()
-{
-  // Serial.print("B: ");
-  // Serial.println(digitalRead(OUTPUT_B));
-  digitalWrite(LED_BUILTIN, HIGH);
-  if (digitalRead(OUTPUT_B))
+void IRAM_ATTR encoder_ISR() {
+  if (micros() - lastEnc > 100000)
   {
-    counter++;
-  } else {
-    if (counter > 0)
+    lastEnc = micros();
+    // bState = digitalRead(OUTPUT_B);
+    if (digitalRead(OUTPUT_B))
     {
-      counter--;
+      counter++;
+    } else {
+      if (counter > 0)
+      {
+        counter--;
+      }
+      // counter--;
     }
   }
-  // Serial.print("Counter: ");
-  // Serial.println(counter);
-  digitalWrite(LED_BUILTIN, LOW);
+}
+
+void IRAM_ATTR select_ISR() {
+  SSID = "robot" + String(counter);
 }
 
 void setup(){
@@ -91,23 +68,31 @@ void setup(){
   pinMode(OUTPUT_A, INPUT);
   pinMode(OUTPUT_B, INPUT);
 
+  attachInterrupt(OUTPUT_A, encoder_ISR, RISING);
+
   pinMode(BIG_BUTTON, INPUT_PULLDOWN);
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
 
-  attachInterrupt(OUTPUT_A, encoder_ISR, RISING);
+  pinMode(SELECT_PIN, INPUT_PULLDOWN);
+  attachInterrupt(SELECT_PIN, select_ISR, RISING);
 
   Serial.begin(9600);
 
 }
 
 void loop(){
-  display.showNumberDec(counter);
-  delay(50);
-  
+  if (oldCount != counter)
+  {
+    display.showNumberDec(counter);
+    oldCount = counter;
+    Serial.print(counter);
+    Serial.print(", ");
+    Serial.println(millis());
+  }
 
-  // Serial.println(counter);
-  // delay(50);
+  if (/* condition */)
+  {
+    /* code */
+  }
+  
 }
