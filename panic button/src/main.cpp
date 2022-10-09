@@ -16,7 +16,7 @@
 
 #define BIG_BUTTON 5
 
-#define SELECT_PIN 15 //button on encoder
+#define SELECT_PIN 16 //button on encoder
 
 int oldCount = 0;
 int counter = 0;
@@ -55,9 +55,9 @@ void IRAM_ATTR encoder_ISR() {
   }
 }
 
-void IRAM_ATTR select_ISR() {
-  SSID = "robot" + String(counter);
-}
+// void IRAM_ATTR select_ISR() {
+//   SSID = "robot" + String(counter);
+// }
 
 void setup(){
   display.clear();
@@ -74,7 +74,7 @@ void setup(){
 
 
   pinMode(SELECT_PIN, INPUT_PULLDOWN);
-  attachInterrupt(SELECT_PIN, select_ISR, RISING);
+  // attachInterrupt(SELECT_PIN, select_ISR, RISING);
 
   Serial.begin(9600);
 
@@ -90,9 +90,14 @@ void loop(){
     Serial.println(millis());
   }
 
-  if (/* condition */)
+  if ( digitalRead(SELECT_PIN) == HIGH)
   {
-    /* code */
+    display.setSegments(data);
+    delay(250);
+    Serial.print("Pressed");
   }
+   Serial.print(digitalRead(SELECT_PIN));
+   delay(50);
+  
   
 }
