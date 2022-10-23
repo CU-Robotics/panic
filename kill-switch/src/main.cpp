@@ -7,7 +7,7 @@
 
 /* ESP32 client-server wifi communication between two boards */
 //set access point network credentials
-const char* ssid = "ESP32-Access-Point1";
+const char* ssid = "test-Point2";
 const char* password = "123456789";
 
 //create AsyncWebServer object on port 80
@@ -25,10 +25,7 @@ void setup(){
 
   Serial.begin(9600);
 
-  /* ESP32 client-server wifi communication between two boards */
-  // Serial port for debugging purposes
-  //Serial.begin(115200);
-  //Serial.println();
+  WiFi.mode(WIFI_AP);
   
   //Setting the ESP as an access point
   Serial.print("Setting AP (Access Point)…");
@@ -58,6 +55,10 @@ void loop(){
   if(client) {
     Serial.println("new client");
     client.println("connected");
+    while(client.connected() && client.available()) {\
+      char c = client.read();
+      Serial.print(c);
+    }
     client.stop();
   }
 
