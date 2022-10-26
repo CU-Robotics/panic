@@ -1,17 +1,18 @@
 #include <Arduino.h>
 #include "WiFi.h"
-// #include "ESPAsyncWebServer.h"
+#include "ESPAsyncWebServer.h"
 
 #define IN1 14
 #define IN2 27
 
 /* ESP32 client-server wifi communication between two boards */
 //set access point network credentials
-const char* ssid = "test-Point2";
+const char* ssid = "robot1g";
 const char* password = "123456789";
 
 //create AsyncWebServer object on port 80
-WiFiServer server(80);
+AsyncWebServer server(80);
+// WiFiServer server(80);
 
 unsigned long lastReceived = INT_MAX;
 unsigned long inDistress = 0;
@@ -23,7 +24,7 @@ void setup(){
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, HIGH);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   WiFi.mode(WIFI_AP);
   
@@ -36,38 +37,22 @@ void setup(){
   Serial.print("AP IP address: ");
   Serial.println(IP);
 
-  // server.on("/connectedToRobot", HTTP_GET, [](AsyncWebServerRequest *request){
-  //   request->send_P(200, "text/plain", "all good");
-  //   lastReceived = millis();
-  // });
+  server.on("/clear", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", "all good");
+    lastReceived = millis();
+    Serial.println("connected");
+  });
 
-  // server.on("/distress", HTTP_GET, [](AsyncWebServerRequest *request){
-  //   request->send_P(200, "text/plain", "panic");
-  //   inDistress = millis();
-  // });
+  server.on("/panic", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", "panic");
+    inDistress = millis();
+    Serial.println("distress");
+  });
 
   server.begin();
 }
 
 void loop(){
-  WiFiClient client = server.available();   // Listen for incoming clients
-
-  if(client) {
-    Serial.println("new client");
-    client.println("connected");
-    while(client.connected() && client.available()) {\
-      char c = client.read();
-      Serial.print(c);
-    }
-    client.stop();
-  }
-
-
-  // if(millis() >= 2000){ //change condition to when button is pressed
-  // digitalWrite(IN1, LOW);
-  // digitalWrite(IN2, LOW);
-  // }
-
   if((millis() - lastReceived > 500) || (millis() - inDistress < 500)){
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
