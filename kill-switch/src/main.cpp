@@ -7,7 +7,7 @@
 
 /* ESP32 client-server wifi communication between two boards */
 //set access point network credentials
-const char* ssid = "robot1g";
+const char* ssid = "robot1";
 const char* password = "123456789";
 
 //create AsyncWebServer object on port 80
