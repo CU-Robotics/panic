@@ -17,7 +17,7 @@
 //create display object of type TM1637
 TM1637Display display = TM1637Display(CLK, DIO); 
 
-Encoder myEnc(OUTPUT_A, OUTPUT_B);
+//Encoder myEnc(OUTPUT_A, OUTPUT_B);
 long oldPosition  = -999;
 
 int counter = 0;
@@ -42,11 +42,11 @@ void setup() {
 }
 
 void loop() {
-    long newPosition = myEnc.read();
-    if (newPosition != oldPosition) {
-        oldPosition = newPosition;
-        Serial.println(newPosition);
-    }
-    delay(1000);
-    Serial.println("test");
+    //long newPosition = myEnc.read();
+    // if (newPosition != oldPosition) {
+    //     oldPosition = newPosition;
+    //     Serial.println(newPosition);
+    // }
+    // delay(1000);
+    // Serial.println("test");
 }
