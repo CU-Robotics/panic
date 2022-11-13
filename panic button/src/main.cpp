@@ -15,9 +15,9 @@
 #define SELECT_PIN 15 //button on encoder
 
 //create display object of type TM1637
-TM1637Display display = TM1637Display(CLK, DIO); //not quite sure about this line
+TM1637Display display = TM1637Display(CLK, DIO); 
 
-Encoder myEnc(5, 6);
+Encoder myEnc(OUTPUT_A, OUTPUT_B);
 long oldPosition  = -999;
 
 int counter = 0;
@@ -38,7 +38,7 @@ void setup() {
     pinMode(SELECT_PIN, INPUT_PULLUP);
 
     Serial.begin(9600);
-    Serial.println("Big red button");   
+    // Serial.println("Big red button");   
 }
 
 void loop() {
@@ -47,4 +47,6 @@ void loop() {
         oldPosition = newPosition;
         Serial.println(newPosition);
     }
+    delay(1000);
+    Serial.println("test");
 }
